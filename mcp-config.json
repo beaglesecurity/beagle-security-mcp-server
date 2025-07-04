@@ -7,11 +7,9 @@
         "--rm",
         "-i",
         "--env", "BEAGLE_SECURITY_API_TOKEN=YOUR_API_TOKEN_HERE",
-        "beagle-security-mcp-server"
-      ],
-      "env": {
-        "NODE_ENV": "production"
-      }
+        "--env", "NODE_ENV=production",
+        "mcp/beagle-security-mcp-server"
+      ]
     }
   }
 }

@@ -8,8 +8,8 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "start": "node build/index.js",
-    "docker:build": "docker build -t beagle-security-mcp-server .",
-    "docker:run": "docker run -it --rm -e BEAGLE_SECURITY_API_TOKEN=$BEAGLE_SECURITY_API_TOKEN beagle-security-mcp-server",
+    "docker:build": "docker build -t mcp/beagle-security-mcp-server .",
+    "docker:run": "docker run -it --rm -e BEAGLE_SECURITY_API_TOKEN=$BEAGLE_SECURITY_API_TOKEN mcp/beagle-security-mcp-server",
     "docker:compose:up": "docker-compose up -d",
     "docker:compose:down": "docker-compose down",
     "docker:compose:logs": "docker-compose logs -f"

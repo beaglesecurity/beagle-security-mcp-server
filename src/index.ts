@@ -569,7 +569,10 @@ class BeagleSecurityMCPServer {
   async run() {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.error("Beagle Security MCP server running on stdio");
+    // Only log to stderr in development mode
+    if (process.env.NODE_ENV !== 'production') {
+      console.error("Beagle Security MCP server running on stdio");
+    }
   }
 }
 

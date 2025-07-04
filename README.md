@@ -71,7 +71,8 @@ Add the server to your MCP configuration file:
         "--rm", 
         "-i", 
         "--env", "BEAGLE_SECURITY_API_TOKEN=your_api_token_here",
-        "beagle-security-mcp-server"
+        "--env", "NODE_ENV=production",
+        "mcp/beagle-security-mcp-server"
       ]
     }
   }
@@ -224,13 +225,6 @@ The server includes comprehensive error handling for:
 - Ensure proper scopes are set when generating API tokens
 - Monitor API usage to detect unauthorized access
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
 
 ## License
 

@@ -12,18 +12,14 @@ services:
     restart: unless-stopped
     networks:
       - mcp-network
-    # For stdio mode (default MCP mode)
-    command: ["node", "build/index.js"]
     
-  # Alternative service for network mode (if needed)
+  # Alternative service for network mode (if needed in the future)
   beagle-security-mcp-network:
     build: .
     container_name: beagle-security-mcp-network
     environment:
       - BEAGLE_SECURITY_API_TOKEN=${BEAGLE_SECURITY_API_TOKEN}
       - NODE_ENV=production
-      - MCP_MODE=network
-      - MCP_PORT=3000
     ports:
       - "3000:3000"
     restart: unless-stopped
@@ -31,7 +27,6 @@ services:
       - mcp-network
     profiles:
       - network
-    command: ["node", "build/index.js"]
 
 networks:
   mcp-network:
