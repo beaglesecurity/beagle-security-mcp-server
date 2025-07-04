@@ -89,6 +89,19 @@ class BeagleSecurityMCPServer {
             },
           },
           {
+            name: "beagle_modify_project",
+            description: "Modify an existing project",
+            inputSchema: {
+              type: "object",
+              properties: {
+                projectKey: { type: "string", description: "Project key" },
+                name: { type: "string", description: "Project name" },
+                description: { type: "string", description: "Project description" },
+              },
+              required: ["projectKey", "name", "description"],
+            },
+          },
+          {
             name: "beagle_delete_project",
             description: "Delete a project",
             inputSchema: {
@@ -111,7 +124,6 @@ class BeagleSecurityMCPServer {
                 url: { type: "string", description: "Application URL" },
                 projectKey: { type: "string", description: "Project key" },
                 type: { type: "string", enum: ["WEB", "API"], description: "Application type" },
-                description: { type: "string", description: "Application description" },
               },
               required: ["name", "url", "projectKey", "type"],
             },
@@ -125,6 +137,19 @@ class BeagleSecurityMCPServer {
                 applicationToken: { type: "string", description: "Application token" },
               },
               required: ["applicationToken"],
+            },
+          },
+          {
+            name: "beagle_modify_application",
+            description: "Modify an existing application",
+            inputSchema: {
+              type: "object",
+              properties: {
+                applicationToken: { type: "string", description: "Application token" },
+                name: { type: "string", description: "Application name" },
+                url: { type: "string", description: "Application URL" },
+              },
+              required: ["applicationToken", "name", "url"],
             },
           },
           {
@@ -169,9 +194,10 @@ class BeagleSecurityMCPServer {
               type: "object",
               properties: {
                 applicationToken: { type: "string", description: "Application token" },
-                signature: { type: "string", description: "Domain verification signature" },
+                signatureType: { type: "string", enum: ["FILE", "DNS", "API"], description: "Type of signature verification" },
+                pluginType: { type: "string", enum: ["WORDPRESS"], description: "Plugin type (optional)" },
               },
-              required: ["applicationToken", "signature"],
+              required: ["applicationToken", "signatureType"],
             },
           },
 
@@ -183,7 +209,6 @@ class BeagleSecurityMCPServer {
               type: "object",
               properties: {
                 applicationToken: { type: "string", description: "Application token" },
-                testType: { type: "string", description: "Type of test to run" },
               },
               required: ["applicationToken"],
             },
@@ -207,9 +232,8 @@ class BeagleSecurityMCPServer {
               type: "object",
               properties: {
                 applicationToken: { type: "string", description: "Application token" },
-                resultToken: { type: "string", description: "Result token from test start" },
               },
-              required: ["applicationToken", "resultToken"],
+              required: ["applicationToken"],
             },
           },
           {
@@ -261,6 +285,8 @@ class BeagleSecurityMCPServer {
             return await this.createProject(args);
           case "beagle_list_projects":
             return await this.listProjects(args);
+          case "beagle_modify_project":
+            return await this.modifyProject(args);
           case "beagle_delete_project":
             return await this.deleteProject(args);
 
@@ -269,6 +295,8 @@ class BeagleSecurityMCPServer {
             return await this.createApplication(args);
           case "beagle_get_application":
             return await this.getApplication(args);
+          case "beagle_modify_application":
+            return await this.modifyApplication(args);
           case "beagle_list_applications":
             return await this.listApplications(args);
           case "beagle_delete_application":
@@ -351,6 +379,26 @@ class BeagleSecurityMCPServer {
     };
   }
 
+  private async modifyProject(args: any) {
+    const result = await this.makeRequest("/projects", {
+      method: "PUT",
+      body: JSON.stringify({
+        projectKey: args.projectKey,
+        name: args.name,
+        description: args.description,
+      }),
+    });
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Project modified successfully:\n${JSON.stringify(result, null, 2)}`,
+        },
+      ],
+    };
+  }
+
   private async deleteProject(args: any) {
     const result = await this.makeRequest(`/projects?project_key=${args.projectKey}`, {
       method: "DELETE",
@@ -373,9 +421,8 @@ class BeagleSecurityMCPServer {
       body: JSON.stringify({
         name: args.name,
         url: args.url,
-        project_key: args.projectKey,
+        projectKey: args.projectKey,
         type: args.type,
-        description: args.description,
       }),
     });
 
@@ -397,6 +444,26 @@ class BeagleSecurityMCPServer {
         {
           type: "text",
           text: `Application details:\n${JSON.stringify(result, null, 2)}`,
+        },
+      ],
+    };
+  }
+
+  private async modifyApplication(args: any) {
+    const result = await this.makeRequest("/applications", {
+      method: "PUT",
+      body: JSON.stringify({
+        applicationToken: args.applicationToken,
+        name: args.name,
+        url: args.url,
+      }),
+    });
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Application modified successfully:\n${JSON.stringify(result, null, 2)}`,
         },
       ],
     };
@@ -448,8 +515,9 @@ class BeagleSecurityMCPServer {
     const result = await this.makeRequest("/applications/signature/verify", {
       method: "POST",
       body: JSON.stringify({
-        application_token: args.applicationToken,
-        signature: args.signature,
+        applicationToken: args.applicationToken,
+        signatureType: args.signatureType,
+        pluginType: args.pluginType,
       }),
     });
 
@@ -468,8 +536,7 @@ class BeagleSecurityMCPServer {
     const result = await this.makeRequest("/test/start", {
       method: "POST",
       body: JSON.stringify({
-        application_token: args.applicationToken,
-        test_type: args.testType,
+        applicationToken: args.applicationToken,
       }),
     });
 
@@ -502,8 +569,7 @@ class BeagleSecurityMCPServer {
     const result = await this.makeRequest("/test/stop", {
       method: "POST",
       body: JSON.stringify({
-        application_token: args.applicationToken,
-        result_token: args.resultToken,
+        applicationToken: args.applicationToken,
       }),
     });
 
