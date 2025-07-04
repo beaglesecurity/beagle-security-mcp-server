@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  beagle-security-mcp:
+    build: .
+    container_name: beagle-security-mcp-server
+    environment:
+      - BEAGLE_SECURITY_API_TOKEN=${BEAGLE_SECURITY_API_TOKEN}
+      - NODE_ENV=production
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+    networks:
+      - mcp-network
+    # For stdio mode (default MCP mode)
+    command: ["node", "build/index.js"]
+    
+  # Alternative service for network mode (if needed)
+  beagle-security-mcp-network:
+    build: .
+    container_name: beagle-security-mcp-network
+    environment:
+      - BEAGLE_SECURITY_API_TOKEN=${BEAGLE_SECURITY_API_TOKEN}
+      - NODE_ENV=production
+      - MCP_MODE=network
+      - MCP_PORT=3000
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    networks:
+      - mcp-network
+    profiles:
+      - network
+    command: ["node", "build/index.js"]
+
+networks:
+  mcp-network:
+    driver: bridge
+
+volumes:
+  mcp-data:
+    driver: local
